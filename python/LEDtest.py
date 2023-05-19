@@ -1,14 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#LED two Seconds on/off
+
 import RPi.GPIO as GPIO
 import time
 
-def led(pin, t):
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(pin, GPIO.OUT)
+LED=17
 
-    GPIO.output(pin, True)
-    time.sleep(t) 
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED,GPIO.OUT,initial=GPIO.LOW) 
 
-    GPIO.cleanup(pin)
 
-led(18, 5) # 18번 핀에 끼운 LED를 5초동안 점등
-#
+try:
+    while 1:
+        GPIO.output(17,False)#led off
+        time.sleep(2)#2sec
+        print("LED ON")
+        GPIO.output(17,True)#led on
+        time.sleep(2)
+        print("LED OFF")
+except KeyvoardInterrupt:
+    pass
+
+GPIO.cleanup() 
