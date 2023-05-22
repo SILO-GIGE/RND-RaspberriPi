@@ -21,6 +21,6 @@ try:
         time.sleep(2)
         print("LED OFF")
 except KeyvoardInterrupt:
-    pass
+    GPIO.cleanup()
 
 GPIO.cleanup() 
