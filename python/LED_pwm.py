@@ -1,3 +1,5 @@
+#밝기가 0에서 100 까지 0.1초 간격으로 바뀌는 코드
+
 import RPi.GPIO as GPIO
 import time
 

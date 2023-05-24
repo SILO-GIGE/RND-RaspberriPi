@@ -20,14 +20,10 @@ unsigned long rotation_number_2=steps;//원하는 모터 회전수
 AccelStepper stepper1(HALFSTEP, mtrPin1, mtrPin3, mtrPin2, mtrPin4); //모터1정의
 AccelStepper stepper2(HALFSTEP, mtrPin_1, mtrPin_3, mtrPin_2, mtrPin_4); //모터2정의
 
-#define ONE_TURN_PULSE 3600 
-u16 motorPosition;
-
 void setup() {
   Serial.begin(9600);
   stepper1.setMaxSpeed(2000.0);
   stepper2.setMaxSpeed(2000.0);
-  //pinMode(13,OUTPUT);
 }
 char state;
 
@@ -37,7 +33,7 @@ void loop(){
   stepper2.stop();
   stepper1.disableOutputs(); //motor power disconnect, so motor led will turn off
   stepper2.disableOutputs();
-  Serial.println("NOOOOOOO");delay(500);//모터정지상태(전원x)일때 STOP보내기
+  Serial.println("NO");delay(500);//모터정지상태(전원x)일때 STOP보내기
   
   if(Serial.available()){  //데이터가 들어오면
     state=Serial.read();  //state에 읽은 데이터 입력
@@ -51,7 +47,7 @@ void loop(){
     }
   }
 }
-void _CCW() {  //창문열기(시계방향회전)
+void _CCW() { 
   for (;;) {
     stepper1.moveTo(rotation_number_1);
     stepper2.moveTo(rotation_number_2);
@@ -68,7 +64,7 @@ void _CCW() {  //창문열기(시계방향회전)
   }
 }
 
-void _CW(){ //창문닫기(반시계방향회전)
+void _CW(){ 
   for(;;){
     stepper1.moveTo(-rotation_number_1);
     stepper2.moveTo(-rotation_number_2);
