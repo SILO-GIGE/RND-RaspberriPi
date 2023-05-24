@@ -6,21 +6,24 @@
 import RPi.GPIO as GPIO
 import time
 
-LED=17
+LED_pin=18
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(LED,GPIO.OUT,initial=GPIO.LOW) 
+GPIO.setup(LED_pin,GPIO.OUT,initial=GPIO.LOW) 
 
-
-try:
-    while 1:
-        GPIO.output(17,False)#led off
+while True:
+    try:
+        GPIO.output(LED_pin,False)#led off
         time.sleep(2)#2sec
         print("LED ON")
-        GPIO.output(17,True)#led on
+        GPIO.output(LED_pin,True)#led on
         time.sleep(2)
         print("LED OFF")
-except KeyvoardInterrupt:
-    GPIO.cleanup()
+
+    except KeyboardInterrupt:
+        pass
+        print('Exit with ^C. Goodbye!')
+        GPIO.cleanup() #pin reset
+        exit() #code end
 
 GPIO.cleanup() 
