@@ -1,33 +1,17 @@
-import time
-import RPi.GPIO as GPIO
+from flask import Flask, render_template_string, request  
+import RPi.GPIO as GPIO    
+from time import sleep
+from RpiMotorLib import RpiMotorLib
+GPIO_pins = (14, 15, 18)
+direction = 20      
+step = 21
 
-GPIO.setmode(GPIO.BCM)
-StepPins=[12,16,20,21]
-
-for pin in StepPins:
-    GPIO.setup(pin,GPIO.OUT)
-    GPIO.output(pin,False)
-
-StepCounter=0
-StepCount=4
-
-Seq=[[0,0,0,1],[0,0,1,0],[0,1,0,0],[1,0,0,0]]
-
-try:
-    while 1:
-        for pin in range(0,4):
-            xpin =StepPins[pin]
-            if Seq[StepCounter][pin]!=0:
-                GPIO.output(xpin,True)
-            else:
-                GPIO.output(xpin,False)
-        StepCounter +=1
-
-        if(StepCounter==StepCount):
-            StepCounter=0
-        if (StepCounter<0):
-            StepCounter=StepCount
-
-        time.sleep(0.01)
-except KeyboardInterrupt:
-    GPIO.cleanup()
+slider = request.form["slider"]
+print(int(slider))
+if (int(slider)>10):
+       mymotortest.motor_go(True, "Full" , 600,int(slider)*.0004, False, .05)
+       print("Rotating Clockwise")
+#Repeat the same procedure for the slider values less than 10.
+if (int(slider)<10):
+     mymotortest.motor_go(False, "Full" , 600,int(slider)*.001, False, .05)
+     print("Rotating Anti-Clockwise")
