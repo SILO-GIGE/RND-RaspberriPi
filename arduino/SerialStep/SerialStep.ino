@@ -12,7 +12,7 @@ Stepper stepper(STEPS, STEP_IN4, STEP_IN2, STEP_IN3, STEP_IN1);
 
 void setup(){
     Serial.begin(9600);
-    stepper.
+    //stepper.
     Serial.println("Ready");
 }
 
