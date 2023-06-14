@@ -3,7 +3,7 @@ from brother_ql.conversion import convert
 from brother_ql.backends.helpers import send
 from brother_ql.raster import BrotherQLRaster
 
-im = Image.open("이미지 경로")
+im = Image.open("/home/silolab_ksh/Desktop/RND-RaspberryPi/TDMovieOut.0.bmp")
 
 backend = 'pyusb'    # 'pyusb', 'linux_kernal', 'network'
 model = 'QL-700' # your printer model.
@@ -28,4 +28,5 @@ instructions = convert(
 
 )
 
+# 여기까지는 실행 됨. 밑에 send함수에서 문제발생
 send(instructions=instructions, printer_identifier=printer, backend_identifier=backend, blocking=True)
