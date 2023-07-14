@@ -16,5 +16,5 @@ dispatcher.map("/address1", handle_osc_address1)
 dispatcher.map("/address2", handle_osc_address2)
 
 # OSC 서버 생성 및 Dispatcher와 연결
-server = BlockingOSCUDPServer(("192.168.0.54", 9000), dispatcher)
+server = BlockingOSCUDPServer(("192.168.0.54", 5000), dispatcher)
 server.serve_forever()
