@@ -1,16 +1,28 @@
 """
-라즈베리파이 서버 테스트 코드.
-TD에서 보낸 osc신호를 print로 출력한다.
+ 윈도우 터디에서 보낸 버튼 0/1상태 OSC신호로 받아서 LED ON/OFF
 """
-Tkinter창에 출력한다.
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
 from pythonosc import udp_client
+import RPi.GPIO as GPIO
+import time
+
+LED_pin=17
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED_pin,GPIO.OUT,initial=GPIO.LOW)
 
 # OSC 메시지 처리를 위한 콜백 함수
 def receive_osc_message(address, *args):
-    print(f"Received OSC message from {address}: {args}")
+    if address == "/button1":
+        print(f"Received OSC message from {address}: {args}")
+        if args[0]==1:
+            GPIO.output(LED_pin,True)#led on (GPIO.HIGH)
+        elif args[0]==0:
+            GPIO.output(LED_pin,False)#led off
+
+
+            
 
 # OSC 서버 설정
 ip = '0.0.0.0'  # 모든 IP 주소에서 들으려면 '0.0.0.0'을 사용합니다.
@@ -28,3 +40,4 @@ try:
     server.serve_forever()
 except KeyboardInterrupt:
     server.server_close()
+    GPIO.cleanup()# Cleanup GPIO on program exit
