@@ -5,7 +5,6 @@ TD에서 보낸 osc신호를 print로 출력한다.
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
-
 from pythonosc import udp_client
 
 # OSC 메시지 처리를 위한 콜백 함수

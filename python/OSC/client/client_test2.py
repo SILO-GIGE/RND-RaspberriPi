@@ -4,7 +4,7 @@
 from pythonosc.udp_client import SimpleUDPClient
 
 ip = "192.168.0.54"
-port = 5000
+port = 6001
 
 client = SimpleUDPClient(ip, port)  # Create client
 
