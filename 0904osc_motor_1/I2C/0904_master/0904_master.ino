@@ -1,3 +1,4 @@
+
 // '/dev/tty/ACM0'
 // 스텝모터제어
 // python에서 보낸 시리얼 신호받아서 모터제어.
@@ -12,6 +13,7 @@ Eighth step (HHL):1바퀴 1600스텝
 Sixteenth step (HHH): 1바퀴 3200스텝
 
 */
+#include <Wire.h>
 #include <AccelStepper.h>
 #define dirPin1 2
 #define stepPin1 3
@@ -29,14 +31,27 @@ void setup() {
   stepper1.setMaxSpeed(6400);
   stepper2.setMaxSpeed(6400);
   Serial.begin(9600);
+  Wire.begin();//Master 설정. 주소 안적음.
 }
-
+byte x=0;
 void loop() 
 { 
 
   if (Serial.available() > 0) {
     char receivedChar = Serial.read();
     if (receivedChar == '1') {
+      Wire.beginTransmission(1);// 슬레이브주소 1번 전송시작
+      Wire.write("good");//문자열전송
+      Wire.endTransmission();//전송중단
+      delay(500);
+
+      Wire.requestFrom(1,4); //슬레이브 (1)dp 4byte요청
+      while(Wire.available()){
+        char c =Wire.read();
+        Serial.print(c);
+      }
+      x++;
+      if(x==6) x=0;
       stepper1.setCurrentPosition(0);//위치 초기화
       Serial.println("1  in ");
       while(stepper1.currentPosition()!=3200){ //Siteeth step일때 10도 움직임.
