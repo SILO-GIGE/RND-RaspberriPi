@@ -32,7 +32,7 @@ def control_led(arduino, status):
 
 # 시리얼 포트와 속도 설정 (시리얼 포트 이름은 자신의 환경에 따라 변경해야 합니다)
 ser = serial.Serial('/dev/ttyACM0', 9600)
-ser2= serial.Serial('/dev/ttyACM1',9600)
+#ser2= serial.Serial('/dev/ttyACM1',9600)
 
 # OSC 서버의 IP 주소와 포트 번호를 설정합니다.
 ip_win= '192.168.0.54'  # OSC 서버의 IP 주소를 입력합니다.
@@ -53,8 +53,7 @@ print(f"OSC server listening on {ip_raspi}:{port_raspi}")
 client = udp_client.SimpleUDPClient(ip_win, port_win)
 
 # OSC 메시지 보내기
-address = '/Raspi->windowTD'  # OSC 주소를 입력합니다.
-
+address = '/Raspi->windowTD'  # OSC 주소를 입력합니다
 num_messages = 100  # 보내고자 하는 횟수를 지정합니다.
 current_value = 0  # 현재 보내고 있는 값의 초기값을 0으로 설정합니다.
 # OSC 메시지 수신 대기
@@ -68,4 +67,4 @@ try:
 except KeyboardInterrupt:
     server.server_close()
     ser.close()
-    ser2.close()
+    #ser2.close()
