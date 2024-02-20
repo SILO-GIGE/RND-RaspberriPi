@@ -36,6 +36,7 @@ dispatcher.set_default_handler(receive_osc_message)  # 모든 메시지를 동�
 server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 # OSC 메시지 수신 대기
+
 try:
     server.serve_forever()
 except KeyboardInterrupt:

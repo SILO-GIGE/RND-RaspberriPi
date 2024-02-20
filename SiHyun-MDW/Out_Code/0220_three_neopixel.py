@@ -14,7 +14,7 @@ import os
 
 # LED 설정
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
-num_pixels = 512  # 32x16 픽셀 LED
+num_pixels = 768  # 32x16 픽셀 LED
 ORDER = neopixel.RGB
 
 # LED 초기화

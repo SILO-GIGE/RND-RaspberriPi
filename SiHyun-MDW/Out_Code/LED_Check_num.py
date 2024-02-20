@@ -55,7 +55,7 @@ def image_to_pixels(image_path):
 def show_image_led_by_led(image_pixels):
     for i in range(num_pixels):
         pixels.fill((0, 0, 0))  # 모든 LED를 끄고
-        pixels[i] = image_pixels[i]  # 현재 LED에 대한 픽셀 데이터를 켜고
+        pixels[0] = image_pixels[0]  # 현재 LED에 대한 픽셀 데이터를 켜고
         pixels.show()  # LED 업데이트
         time.sleep(0.1)  # 0.1초 대기
 
