@@ -1,9 +1,8 @@
 '''
 [02/22]
- - 16 x 16 Five LED pixel 300 image play
- - For 10 seconds 1/30 frame
- - Image crop
- - Receive and Send OSC signal 
+ - 5면 LED pixel 10초 콘텐츠 재생.
+ - 윈도우로부터 OSC신호로 1을 수신하면 콘텐츠10초 재생.
+ - 콘텐츠 재생이 끝나면 윈도우로 OSC신호 3을 전송.
 '''
 # -*- coding: utf-8 -*-g
 
@@ -18,50 +17,56 @@ from pythonosc import dispatcher
 from pythonosc import osc_server
 from pythonosc import udp_client
 
+#######################################################################
+Main_port_num=5556  # Window 포트번호
+Server1_port_num=4207  #라즈베리파이 포트번호
+
+# LED 설정
+pixel_pin = board.D18  # GPIO 18에 연결된 LED
+num_pixels = 1280 #256 픽셀 LED 5개
+ORDER = neopixel.RGB
+
 # OSC 클라이언트 설정
 client_ip = '192.168.0.5'  # Window IP 주소
-client_port = 5556  # 클라이언트 포트 번호
+client_port = Main_port_num
 osc_client = udp_client.SimpleUDPClient(client_ip, client_port)
 
 # OSC 서버 설정
-ip = '0.0.0.0'  # 모든 IP 주소에서 들으려면 '0.0.0.0'을 사용합니다.
-port = 4207 # TouchDesigner에서 설정한 포트 번호로 변경해야 합니다.
+ip = '0.0.0.0'  # 모든 IP 주소에서 수신
+port = Server1_port_num
+#######################################################################
+
 
 # OSC 메시지 처리를 위한 콜백 함수
 def receive_osc_message(address, *args):
     if address == "/SILOKSH":
         print(f"Received OSC message from {address}: {args}")
+        #OSC신호 1을 수신하면 콘텐츠 재생
         if args[0]==1:
             for i in range(num_iterations):
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
-                show_image(*image_pixels_list[index])
+                show_image(*image_pixels_list[index]) #이미지를 출력.
                 time.sleep(interval)
-                # 이미지가 모두 재생된 후 LED를 끄고 OSC 메시지를 보냅니다.
-            time.sleep(1)
+            # 이미지가 모두 재생된 후 LED를 끄고 OSC 메시지 전송
+            time.sleep(0.5)
             pixels.fill((0, 0, 0))
             pixels.show()
             osc_client.send_message("/Rasp", 3)
-            print("Sent OSC message: /Rasp 3")  # OSC 메시지를 터미널에 출력합니다.
+            print("Sent OSC message: /Rasp 3")  # 전송한 메시지 출력
+        #OSC신호 0을 수신하면 콘텐츠 종료
         elif args[0]==0:
-            # 모든 이미지 송출이 끝나면 LED를 끕니다.
             pixels.fill((0, 0, 0))
             pixels.show()
             
 # OSC 디스패처 설정
 dispatcher = dispatcher.Dispatcher()
-dispatcher.set_default_handler(receive_osc_message)  # 모든 메시지를 동일한 핸들러로 전달합니다.
+dispatcher.set_default_handler(receive_osc_message)
 
 # OSC 서버 시작
 server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
-
-# LED 설정
-pixel_pin = board.D18  # GPIO 18에 연결된 LED
-num_pixels = 1280 # 32x16 픽셀 LED
-ORDER = neopixel.RGB
-
-# LED 초기화
+# LED 초기화 및 설정
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.1, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
@@ -70,22 +75,24 @@ directory_path = "/home/silolab_ksh/Desktop/Contents/80x16png/"
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
 
-# 디렉토리 내 모든 파일에 대해 반복
+# 이미지경로에 있는 png파일 가져오기
 for filename in os.listdir(directory_path):
     if filename.endswith(".png"):  # jpg 파일인 경우에만 처리
         image_paths.append(filename)
 
-# 파일 이름들을 숫자 부분을 기준으로 정렬
+# 파일 이름들의 숫자 순서대로 정렬
 image_paths.sort(key=lambda x: int(x.split("_")[1].split(".")[0]))
 
 # 정렬된 파일 이름들에 디렉토리 경로를 추가하여 완전한 파일 경로를 생성
 image_paths = [os.path.join(directory_path, filename) for filename in image_paths]
  
+ 
+#########################################################################
 # 이미지를 픽셀 배열로 변환하는 함수
 def image_to_pixels(image_path):
-    image = Image.open(image_path)#Get image from image path
+    image = Image.open(image_path)
     image = image.convert("RGB")
-    # 이미지를 32x16 크기로 자르기
+    # 이미지를 왼쪽부터 16x16 크기로 자르기
     image1 = image.crop((0, 0, 16, 16))   # 첫 번째 영역: (0, 0)에서 (16, 16)까지
     image2 = image.crop((16, 0, 32, 16))  # 두 번째 영역: (16, 0)에서 (32, 16)까지
     image3 = image.crop((32, 0, 48, 16))  # 세 번째 영역: (32, 0)에서 (48, 16)까지
@@ -107,10 +114,11 @@ def image_to_pixels(image_path):
     image3_pixels = list(image3.getdata())
     image4_pixels = list(image4.getdata())
     image5_pixels = list(image5.getdata())
-
-    # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
+    
+    #다듬어진 이미지를 배열에 저장. 
     image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
-
+    
+    # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
     for image_pixels in image_pixel_lists:
         for y in range(16):
             if y % 2 == 1:  # 홀수 번째 행일 때
@@ -119,7 +127,7 @@ def image_to_pixels(image_path):
                 image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
     return image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels
 
-
+#########################################################################
 # 이미지 출력 함수
 def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels):
     image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
@@ -139,8 +147,9 @@ interval = 1 / 30  # 1/30초 간격
 total_time = 10  # 10초
 num_iterations = int(total_time / interval)
 
-# OSC 메시지 수신 대기
 
+#########################################################################
+# OSC 메시지 수신 대기
 try:
     while True:
         server.handle_request()
@@ -148,6 +157,6 @@ except KeyboardInterrupt:
     server.server_close()
     
 
-# 모든 이미지 송출이 끝나면 LED를 끕니다.
+# 모든 이미지 송출이 끝나면 LED를 종료.
 pixels.fill((0, 0, 0))
 pixels.show()
