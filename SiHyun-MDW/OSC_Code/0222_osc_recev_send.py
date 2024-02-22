@@ -12,14 +12,15 @@ from PIL import Image
 import time
 import os
 import threading
+import sys
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
 from pythonosc import udp_client
 
 #######################################################################
-Main_port_num=5556  # Window 포트번호
-Server1_port_num=4207  #라즈베리파이 포트번호
+Main_port_num=5557  # Window 포트번호
+Server1_port_num=4208  #라즈베리파이 포트번호
 
 # LED 설정
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
