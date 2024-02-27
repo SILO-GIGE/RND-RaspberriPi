@@ -1,5 +1,5 @@
 '''
-[02/20]
+[02/21]
  - 16 x 16 Five LED pixel 300 image play
  - For 10 seconds 1/30 frame
  - Image crop
@@ -15,14 +15,12 @@ import os
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
-#from pythonosc import udp_client
 
 # OSC 메시지 처리를 위한 콜백 함수
 def receive_osc_message(address, *args):
-    if address == "/button1":
+    if address == "/SILOKSH":
         print(f"Received OSC message from {address}: {args}")
         if args[0]==1:
-                        
             for i in range(num_iterations):
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index])
@@ -35,7 +33,7 @@ def receive_osc_message(address, *args):
             
 # OSC 서버 설정
 ip = '0.0.0.0'  # 모든 IP 주소에서 들으려면 '0.0.0.0'을 사용합니다.
-port = 5003  # TouchDesigner에서 설정한 포트 번호로 변경해야 합니다.
+port = 4301 # TouchDesigner에서 설정한 포트 번호로 변경해야 합니다.
 
 # OSC 디스패처 설정
 dispatcher = dispatcher.Dispatcher()
@@ -102,40 +100,27 @@ def image_to_pixels(image_path):
     image5_pixels = list(image5.getdata())
 
     # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
-    
-    for y in range(16):
-        if y % 2 == 1:  # 홀수 번째 행일 때
-            image1_pixels[y * 16: (y + 1) * 16] = reversed(image1_pixels[y * 16: (y + 1) * 16])
-    for y in range(16):
-        if y % 2 == 1:  # 홀수 번째 행일 때
-            image2_pixels[y * 16: (y + 1) * 16] = reversed(image2_pixels[y * 16: (y + 1) * 16])
-    for y in range(16):
-        if y % 2 == 1:  # 홀수 번째 행일 때
-            image3_pixels[y * 16: (y + 1) * 16] = reversed(image3_pixels[y * 16: (y + 1) * 16])
-    for y in range(16):
-        if y % 2 == 1:  # 홀수 번째 행일 때
-            image4_pixels[y * 16: (y + 1) * 16] = reversed(image4_pixels[y * 16: (y + 1) * 16])
-    for y in range(16):
-        if y % 2 == 1:  # 홀수 번째 행일 때
-            image5_pixels[y * 16: (y + 1) * 16] = reversed(image5_pixels[y * 16: (y + 1) * 16])
+    image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
 
+    for image_pixels in image_pixel_lists:
+        for y in range(16):
+            if y % 2 == 1:  # 홀수 번째 행일 때
+                start_index = y * 16
+                end_index = (y + 1) * 16
+                image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
     return image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels
+
 
 # 이미지 출력 함수
 def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels):
-    
-    for i in range(256):
-        pixels[i]=image1_pixels[i]
-    for i in range(256,512):
-        pixels[i]=image2_pixels[i-256]
-    for i in range(512,768):
-        pixels[i]=image3_pixels[i-512]
-    for i in range(768,1024):
-        pixels[i]=image4_pixels[i-768]
-    for i in range(1024,1280):
-        pixels[i]=image5_pixels[i-1024]
-    
-    pixels.show()
+    image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
+    pixel_index = 0
+
+    for image_pixels in image_pixel_lists:
+        for pixel_value in image_pixels:
+            pixels[pixel_index] = pixel_value
+            pixel_index += 1
+    pixels.show() #LED ON
 
 # 각 이미지를 픽셀 배열로 변환하여 배열에 저장
 image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
@@ -153,6 +138,7 @@ try:
 except KeyboardInterrupt:
     server.server_close()
     
+
 # 모든 이미지 송출이 끝나면 LED를 끕니다.
 pixels.fill((0, 0, 0))
 pixels.show()
