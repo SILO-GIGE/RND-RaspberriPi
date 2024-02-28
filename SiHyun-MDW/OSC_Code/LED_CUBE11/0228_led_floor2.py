@@ -142,20 +142,32 @@ image_pixels_lists = [image_to_pixels(image_path) for image_path in image_paths]
 
 #########################################################################
 # 이미지 출력 함수
+<<<<<<< HEAD
 def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels,floor_pixels):
    #image_pixels_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
     #image_pixels_lists.append(floor_pixels)
     all_image_pixels = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
     all_image_pixels.append(floor_pixels)
     
+=======
+# 이미지 출력 함수
+def show_image(image_pixel_lists, floor_pixels):
+    pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+>>>>>>> 8b0dbf6aa2487c8f2b899f81fb05bfb7df8d06b6
     pixel_index = 0
 
     for image_pixels in all_image_pixels:
         for pixel_value in image_pixels:
             pixels[pixel_index] = pixel_value
             pixel_index += 1
+    # Add floor pixels
+    for pixel_value in floor_pixels:
+        pixels[pixel_index] = pixel_value
+        pixel_index += 1
+    
     pixels.show() #LED ON
 
+<<<<<<< HEAD
 ##
 ##
 ### image_to_pixels 함수의 반환값 중에서 첫 번째 값은 이미지 픽셀 값 리스트들, 두 번째 값은 floor 픽셀 값 리스트
@@ -164,12 +176,17 @@ def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pi
 for image_pixels, floor_pixels in image_pixels_lists:
     all_image_pixels = image_pixels + [floor_pixels]
     show_image(*all_image_pixels)
+=======
+# 각 이미지를 픽셀 배열로 변환하여 배열에 저장
+image_data_list = [image_to_pixels(image_path) for image_path in image_paths]
+image_pixels_list = [image_data[0] for image_data in image_data_list]
+floor_pixels_list = [image_data[1] for image_data in image_data_list]
+>>>>>>> 8b0dbf6aa2487c8f2b899f81fb05bfb7df8d06b6
 
 # 이미지를 1/30초 간격으로 송출
 interval = 1 / 30  # 1/30초 간격
 total_time = 15  # 10초
 num_iterations = int(total_time / interval)
-
 
 #########################################################################
 # OSC 메시지 수신 대기
@@ -178,4 +195,4 @@ try:
         server.handle_request()
 except KeyboardInterrupt:
     server.server_close()
-    
+
