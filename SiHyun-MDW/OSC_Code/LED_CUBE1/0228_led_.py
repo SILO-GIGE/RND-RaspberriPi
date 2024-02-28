@@ -24,7 +24,7 @@ Server1_port_num=4206  #라즈베리파이 포트번호
 
 # LED 설정
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
-num_pixels = 1280 #256 픽셀 LED 5개
+num_pixels = 1792 #256 픽셀 LED 5개
 ORDER = neopixel.GRB
 
 # OSC 클라이언트 설정
@@ -72,10 +72,10 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/img_opacity60_nofade/"
+directory_path = "/home/silolab_ksh/Desktop/img_100/"
 ##directory_path= "/home/silolab_ksh/Desktop/RND-RaspberryPi/SiHyun-MDW/Contents/Yedgi/img_yellow_60/"
 #directory_path="/home/silolab_ksh/Desktop/RND-RaspberryPi/SiHyun-MDW/Contents/Kumin2/"
 # 이미지 파일들의 경로를 저장할 배열
@@ -100,23 +100,23 @@ def image_to_pixels(image_path):
     image=Image.open(image_path).convert("RGB")
     enhancer=ImageEnhance.Contrast(image)
     image=enhancer.enhance(2.5)
-    image=image.crop((0,8,80,24))
+    #image=image.crop((0,8,80,24))
     #image=image.convert("RGB")
-    '''
+    
     # 이미지를 왼쪽부터 16x16 크기로 자르기
     image1 = image.crop((0, 8, 16, 24))   # 첫 번째 영역: (0, 0)에서 (16, 16)까지
     image2 = image.crop((16, 8, 32, 24))  # 두 번째 영역: (16, 0)에서 (32, 16)까지
     image3 = image.crop((32, 8, 48, 24))  # 세 번째 영역: (32, 0)에서 (48, 16)까지
     image4 = image.crop((48, 8, 64, 24))  # 네 번째 영역: (48, 0)에서 (64, 16)까지
     image5 = image.crop((64, 8, 80, 24))  # 다섯 번째 영역: (64, 0)에서 (80, 16)까지
-##    floor = image.crop((0,16,8,24))
+    floor = image.crop((0,8,80,8))
     '''
     image1 = image.crop((0, 0, 16, 16))   # 첫 번째 영역: (0, 0)에서 (16, 16)까지
     image2 = image.crop((16, 0, 32, 16))  # 두 번째 영역: (16, 0)에서 (32, 16)까지
     image3 = image.crop((32, 0, 48, 16))  # 세 번째 영역: (32, 0)에서 (48, 16)까지
     image4 = image.crop((48, 0, 64, 16))  # 네 번째 영역: (48, 0)에서 (64, 16)까지
     image5 = image.crop((64, 0, 80, 16))  #  번째 영역: (48, 0)에서 (64, 16)까지
-    
+    '''
 
     # 이미지를 상하로 반전
     image1 = image1.transpose(Image.FLIP_TOP_BOTTOM)
@@ -173,3 +173,8 @@ try:
 except KeyboardInterrupt:
     server.server_close()
     
+'''
+# 모든 이미지 송출이 끝나면 LED를 종료.
+pixels.fill((0, 0, 0))
+pixels.show()
+'''

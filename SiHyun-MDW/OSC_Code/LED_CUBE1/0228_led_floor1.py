@@ -100,6 +100,7 @@ def image_to_pixels(image_path):
     image=Image.open(image_path).convert("RGB")
     enhancer=ImageEnhance.Contrast(image)
     image=enhancer.enhance(2.5)
+    floor=image.crop((0,0,80,8))
     image=image.crop((0,8,80,24))
     #image=image.convert("RGB")
     '''
@@ -116,7 +117,6 @@ def image_to_pixels(image_path):
     image3 = image.crop((32, 0, 48, 16))  # 세 번째 영역: (32, 0)에서 (48, 16)까지
     image4 = image.crop((48, 0, 64, 16))  # 네 번째 영역: (48, 0)에서 (64, 16)까지
     image5 = image.crop((64, 0, 80, 16))  #  번째 영역: (48, 0)에서 (64, 16)까지
-    
 
     # 이미지를 상하로 반전
     image1 = image1.transpose(Image.FLIP_TOP_BOTTOM)
@@ -131,6 +131,7 @@ def image_to_pixels(image_path):
     image3_pixels = list(image3.getdata())
     image4_pixels = list(image4.getdata())
     image5_pixels = list(image5.getdata())
+    floor_pixels=list(floor.getdata())
     
     #다듬어진 이미지를 배열에 저장. 
     image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
@@ -142,12 +143,13 @@ def image_to_pixels(image_path):
                 start_index = y * 16
                 end_index = (y + 1) * 16
                 image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
-    return image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels
+        
+    return image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels,floor_pixels
 
 #########################################################################
 # 이미지 출력 함수
-def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels):
-    image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
+def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels,floor_pixels):
+    image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels,floor_pixels]
     pixel_index = 0
 
     for image_pixels in image_pixel_lists:
