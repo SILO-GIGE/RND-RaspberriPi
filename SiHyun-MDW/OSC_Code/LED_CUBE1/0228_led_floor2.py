@@ -39,7 +39,7 @@ port = Server1_port_num
 
 def enhance_image(image):
     enhancer=ImageEnhance.Brightness(image)
-    enhanced_image=enhancer.enhance(2.0)
+    enhanced_image=enhancer.enhance(2.5)
     return enhanced_image
 
 # OSC 메시지 처리를 위한 콜백 함수
@@ -47,10 +47,10 @@ def receive_osc_message(address, *args):
     if address == "/SILOKSH":
         print(f"Received OSC message from {address}: {args}")
         #OSC신호 1을 수신하면 콘텐츠 재생
-        if args[0]==1:
+        if args and args[0] == 1:
             for i in range(num_iterations):
-                index = i % len(image_pixels_list)  # 이미지 배열을 순환
-                show_image(*image_pixels_list[index]) #이미지를 출력.
+                index = i % len(all_pixels_lists)  # 이미지 배열을 순환
+                show_image(*all_pixels_pixels[index]) #이미지를 출력.
                 time.sleep(interval)
             # 이미지가 모두 재생된 후 LED를 끄고 OSC 메시지 전송
             time.sleep(0.5)
@@ -59,7 +59,7 @@ def receive_osc_message(address, *args):
             osc_client.send_message("/Rasp1", 3)
             print("Sent OSC message: /Rasp1 3")  # 전송한 메시지 출력
         #OSC신호 0을 수신하면 콘텐츠 종료
-        elif args[0]==0:
+        elif args and args[0] == 0:
             pixels.fill((0, 0, 0))
             pixels.show()
             
@@ -103,15 +103,7 @@ def image_to_pixels(image_path):
     floor=image.crop((0,0,80,8))
     image=image.crop((0,8,80,24))
     #image=image.convert("RGB")
-    '''
-    # 이미지를 왼쪽부터 16x16 크기로 자르기
-    image1 = image.crop((0, 8, 16, 24))   # 첫 번째 영역: (0, 0)에서 (16, 16)까지
-    image2 = image.crop((16, 8, 32, 24))  # 두 번째 영역: (16, 0)에서 (32, 16)까지
-    image3 = image.crop((32, 8, 48, 24))  # 세 번째 영역: (32, 0)에서 (48, 16)까지
-    image4 = image.crop((48, 8, 64, 24))  # 네 번째 영역: (48, 0)에서 (64, 16)까지
-    image5 = image.crop((64, 8, 80, 24))  # 다섯 번째 영역: (64, 0)에서 (80, 16)까지
-##    floor = image.crop((0,16,8,24))
-    '''
+    
     image1 = image.crop((0, 0, 16, 16))   # 첫 번째 영역: (0, 0)에서 (16, 16)까지
     image2 = image.crop((16, 0, 32, 16))  # 두 번째 영역: (16, 0)에서 (32, 16)까지
     image3 = image.crop((32, 0, 48, 16))  # 세 번째 영역: (32, 0)에서 (48, 16)까지
@@ -134,33 +126,44 @@ def image_to_pixels(image_path):
     floor_pixels=list(floor.getdata())
     
     #다듬어진 이미지를 배열에 저장. 
-    image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
+    image_pixels_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
     
     # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
-    for image_pixels in image_pixel_lists:
+    for image_pixels in image_pixels_lists:
         for y in range(16):
             if y % 2 == 1:  # 홀수 번째 행일 때
                 start_index = y * 16
                 end_index = (y + 1) * 16
                 image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
-    return image_pixels_list,floor_pixels
+    return image_pixels_lists, floor_pixels 
+
+# 각 이미지를 픽셀 배열로 변환하여 배열에 저장
+image_pixels_lists = [image_to_pixels(image_path) for image_path in image_paths]
 
 #########################################################################
 # 이미지 출력 함수
 def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels,floor_pixels):
-    image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
-    image_pixels_list.append(floor_pixels)
+   #image_pixels_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
+    #image_pixels_lists.append(floor_pixels)
+    all_image_pixels = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
+    all_image_pixels.append(floor_pixels)
     
     pixel_index = 0
 
-    for image_pixels in image_pixel_lists:
+    for image_pixels in all_image_pixels:
         for pixel_value in image_pixels:
             pixels[pixel_index] = pixel_value
             pixel_index += 1
     pixels.show() #LED ON
 
-# 각 이미지를 픽셀 배열로 변환하여 배열에 저장
-image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
+##
+##
+### image_to_pixels 함수의 반환값 중에서 첫 번째 값은 이미지 픽셀 값 리스트들, 두 번째 값은 floor 픽셀 값 리스트
+##for image_pixels, floor_pixels in image_pixels_lists:
+##    show_image(*image_pixels, floor_pixels)  # 이미지 픽셀 값들과 floor_pixels를 함께 전달
+for image_pixels, floor_pixels in image_pixels_lists:
+    all_image_pixels = image_pixels + [floor_pixels]
+    show_image(*all_image_pixels)
 
 # 이미지를 1/30초 간격으로 송출
 interval = 1 / 30  # 1/30초 간격

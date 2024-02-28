@@ -24,7 +24,7 @@ Server1_port_num=4206  #라즈베리파이 포트번호
 
 # LED 설정
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
-num_pixels = 1280 #256 픽셀 LED 5개
+num_pixels = 1280 +512#256 픽셀 LED 5개
 ORDER = neopixel.GRB
 
 # OSC 클라이언트 설정
@@ -39,7 +39,7 @@ port = Server1_port_num
 
 def enhance_image(image):
     enhancer=ImageEnhance.Brightness(image)
-    enhanced_image=enhancer.enhance(2.5)
+    enhanced_image=enhancer.enhance(3)
     return enhanced_image
 
 # OSC 메시지 처리를 위한 콜백 함수
@@ -52,6 +52,7 @@ def receive_osc_message(address, *args):
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index]) #이미지를 출력.
                 time.sleep(interval)
+
             # 이미지가 모두 재생된 후 LED를 끄고 OSC 메시지 전송
             time.sleep(0.5)
             pixels.fill((0, 0, 0))
@@ -72,7 +73,8 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.25, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1, auto_write=False, pixel_order=ORDER)
+#pixels1 = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
 directory_path = "/home/silolab_ksh/Desktop/img_opacity60_nofade/"
@@ -137,7 +139,7 @@ def image_to_pixels(image_path):
 
 #########################################################################
 # 이미지 출력 함수
-def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels):
+def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels):
     image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
     pixel_index = 0
 
@@ -145,14 +147,26 @@ def show_image(image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pi
         for pixel_value in image_pixels:
             pixels[pixel_index] = pixel_value
             pixel_index += 1
-    pixels.show() #LED ON
+    
+    # 1부터 1280까지의 LED에 대해 밝기 0.1 설정
+    for i in range(1280):
+        pixels[i] = (int(pixels[i][0] * 0.1), int(pixels[i][1] * 0.1), int(pixels[i][2] * 0.1))
+    
+    # 1280부터 1792까지의 LED에 대해 밝기 1로 설정
+    for i in range(1280, num_pixels):
+        pixels[i] = (255, 255, 255)  # 화이트 설정
+        pixels[i] = (int(255 * 0.3), int(255 * 0.3), int(255 * 0.3))  # 밝기 조절
 
+
+    pixels.show() # LED ON
+
+    
 # 각 이미지를 픽셀 배열로 변환하여 배열에 저장
 image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출
-interval = 1 / 50  # 1/30초 간격
-total_time = 5  # 10초
+interval = 1 / 60  # 1/30초 간격
+total_time = 20  # 10초
 num_iterations = int(total_time / interval)
 
 
