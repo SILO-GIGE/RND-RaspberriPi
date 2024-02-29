@@ -93,7 +93,7 @@ image_paths.sort(key=lambda x: int(x.split("_")[1].split(".")[0]))
 # 정렬된 파일 이름들에 디렉토리 경로를 추가하여 완전한 파일 경로를 생성
 image_paths = [os.path.join(directory_path, filename) for filename in image_paths]
 
-s
+
 #########################################################################
 # 이미지를 픽셀 배열로 변환하는 함수
 def image_to_pixels(image_path):
