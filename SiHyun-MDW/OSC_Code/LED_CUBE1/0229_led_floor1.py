@@ -24,7 +24,7 @@ Server1_port_num=4206  #라즈베리파이 포트번호
 
 # LED 설정
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
-num_pixels = 1280 +512#256 픽셀 LED 5개
+num_pixels = 1280 +512 #256 픽셀 LED 5개
 ORDER = neopixel.GRB
 
 # OSC 클라이언트 설정
@@ -39,7 +39,7 @@ port = Server1_port_num
 
 def enhance_image(image):
     enhancer=ImageEnhance.Brightness(image)
-    enhanced_image=enhancer.enhance(3)
+    enhanced_image=enhancer.enhance(1)
     return enhanced_image
 
 # OSC 메시지 처리를 위한 콜백 함수
@@ -73,13 +73,12 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 #pixels1 = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/img_opacity60_nofade/"
-##directory_path= "/home/silolab_ksh/Desktop/RND-RaspberryPi/SiHyun-MDW/Contents/Yedgi/img_yellow_60/"
-#directory_path="/home/silolab_ksh/Desktop/RND-RaspberryPi/SiHyun-MDW/Contents/Kumin2/"
+directory_path = "/home/silolab_ksh/Desktop/blackwhite/"
+
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
 
@@ -90,27 +89,26 @@ for filename in os.listdir(directory_path):
 
 # 파일 이름들의 숫자 순서대로 정렬
 image_paths.sort(key=lambda x: int(x.split("_")[1].split(".")[0]))
-#image_paths.sort(key=lambda x: int(os.path.splitext(x)[0]))
 
 # 정렬된 파일 이름들에 디렉토리 경로를 추가하여 완전한 파일 경로를 생성
 image_paths = [os.path.join(directory_path, filename) for filename in image_paths]
-#print(image_paths)
 
+s
 #########################################################################
 # 이미지를 픽셀 배열로 변환하는 함수
 def image_to_pixels(image_path):
     image=Image.open(image_path).convert("RGB")
     enhancer=ImageEnhance.Contrast(image)
-    image=enhancer.enhance(2.5)
-    image=image.crop((0,8,80,24))
-    #image=image.convert("RGB")
+    image=enhancer.enhance(2)
+    
+    #image=image.crop((0,8,80,24))
+
     image1 = image.crop((0, 0, 16, 16))   # 첫 번째 영역: (0, 0)에서 (16, 16)까지
     image2 = image.crop((16, 0, 32, 16))  # 두 번째 영역: (16, 0)에서 (32, 16)까지
     image3 = image.crop((32, 0, 48, 16))  # 세 번째 영역: (32, 0)에서 (48, 16)까지
     image4 = image.crop((48, 0, 64, 16))  # 네 번째 영역: (48, 0)에서 (64, 16)까지
     image5 = image.crop((64, 0, 80, 16))  #  번째 영역: (48, 0)에서 (64, 16)까지
     
-
     # 이미지를 상하로 반전
     image1 = image1.transpose(Image.FLIP_TOP_BOTTOM)
     image2 = image2.transpose(Image.FLIP_TOP_BOTTOM)
@@ -150,12 +148,12 @@ def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image
     
     # 1부터 1280까지의 LED에 대해 밝기 0.1 설정
     for i in range(1280):
-        pixels[i] = (int(pixels[i][0] * 0.5), int(pixels[i][1] * 0.3), int(pixels[i][2] * 0.2))
+        pixels[i] = (int(pixels[i][0] * 0.7), int(pixels[i][1] * 0.5), int(pixels[i][2] * 0.4))
     
     # 1280부터 1792까지의 LED에 대해 밝기 1로 설정
     for i in range(1280, num_pixels):
         pixels[i] = (255, 215, 0)  # 화이트 설정
-        pixels[i] = (int(255 * 0.7), int(255 * 0.5), int(255 * 0.3))  # 밝기 조절
+        pixels[i] = (int(255 * 0.7), int(255 * 0.6), int(255 * 0.4))  # 밝기 조절
 
 
     pixels.show() # LED ON
@@ -165,7 +163,7 @@ def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image
 image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출
-interval = 1 / 60  # 1/30초 간격
+interval = 1 / 30  # 1/30초 간격
 total_time = 50  # 10초
 num_iterations = int(total_time / interval)
 
