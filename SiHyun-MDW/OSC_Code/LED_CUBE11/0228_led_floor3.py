@@ -150,12 +150,12 @@ def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image
     
     # 1부터 1280까지의 LED에 대해 밝기 0.1 설정
     for i in range(1280):
-        pixels[i] = (int(pixels[i][0] * 0.1), int(pixels[i][1] * 0.1), int(pixels[i][2] * 0.1))
+        pixels[i] = (int(pixels[i][0] * 0.5), int(pixels[i][1] * 0.3), int(pixels[i][2] * 0.2))
     
     # 1280부터 1792까지의 LED에 대해 밝기 1로 설정
     for i in range(1280, num_pixels):
-        pixels[i] = (255, 255, 255)  # 화이트 설정
-        pixels[i] = (int(255 * 0.3), int(255 * 0.3), int(255 * 0.3))  # 밝기 조절
+        pixels[i] = (255, 215, 0)  # 화이트 설정
+        pixels[i] = (int(255 * 0.7), int(255 * 0.5), int(255 * 0.3))  # 밝기 조절
 
 
     pixels.show() # LED ON
@@ -166,7 +166,7 @@ image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출
 interval = 1 / 60  # 1/30초 간격
-total_time = 20  # 10초
+total_time = 50  # 10초
 num_iterations = int(total_time / interval)
 
 
