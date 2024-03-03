@@ -5,7 +5,7 @@ from pythonosc import udp_client#client
 from pythonosc import osc_server#server
 
 # OSC 서버의 IP 주소와 포트 번호를 설정합니다.
-ip = '192.168.1.12'  # OSC 서버의 IP 주소를 입력합니다.
+ip = '172.30.1.85'  # OSC 서버의 IP 주소를 입력합니다.
 port = 5556  # OSC 서버가 수신 ```대기하는 포트 번호를 입력합니다.
 
 # OSC 클라이언트 생성
