@@ -87,7 +87,7 @@ print(f"OSC server listening on {ip}:{port}")
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/Composition1/"
+directory_path = "/home/silolab_ksh/Desktop/0304TEST1/TEST1_LED1/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -179,7 +179,7 @@ def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image
     '''
 
     # 1부터 1280까지의 LED에 대해 밝기 0.1 설정
-    #
+    
     for i in range(1280):
         pixels[i] = (int(pixels[i][0] * 1), int(pixels[i][1] * 1), int(pixels[i][2] * 1))
     
@@ -196,9 +196,9 @@ image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출s
 interval = 1 / 30  # 1/30초 간격
-total_time = 54  # 10초
+total_time =  18 # 10초
 num_iterations = int(total_time / interval) #이미지 출력 개수
-
+s
 #########################################################################
 # OSC 메시지 수신 대기
 try:
