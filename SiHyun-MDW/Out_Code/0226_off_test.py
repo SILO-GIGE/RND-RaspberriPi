@@ -1,5 +1,5 @@
 '''
-[02/20]
+[02/26]
  - 16 x 16 two LED pixel 300 image play
  - For 10 seconds 1/30 frame
  - Image crop

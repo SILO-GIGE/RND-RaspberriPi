@@ -37,6 +37,7 @@ import time
 import os
 import threading
 import sys
+import board
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
@@ -99,7 +100,7 @@ print(f"OSC server listening on {ip}:{port}")
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/blackwhite/"
+directory_path = "/home/silolab_ksh/Desktop/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
