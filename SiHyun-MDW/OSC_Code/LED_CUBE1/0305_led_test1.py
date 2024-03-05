@@ -81,7 +81,7 @@ print(f"OSC server listening on {ip}:{port}")
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/test5/"
+directory_path = "/home/silolab_ksh/Desktop/test6/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -108,7 +108,7 @@ image_paths = [os.path.join(directory_path, filename) for filename in image_path
 def image_to_pixels(image_path):
     image=Image.open(image_path).convert("RGB") #이미지를 RGB색상모드로 변환
     enhancer=ImageEnhance.Contrast(image) 
-    image=enhancer.enhance(2.0) #이미지의 채도를 강하게.
+    image=enhancer.enhance(3.0) #이미지의 채도를 강하게.
 
     image1 = image.crop((0, 0, 16, 16)) 
     image2 = image.crop((16, 0, 32, 16)) 
@@ -191,7 +191,7 @@ image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출s
 interval = 1 / 30  # 1/30초 간격
-total_time =  10 # 10초
+total_time =  30 # 10초
 num_iterations = int(total_time / interval) #이미지 출력 개수
 
 #########################################################################
