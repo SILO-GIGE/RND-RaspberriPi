@@ -193,7 +193,7 @@ image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출s
 interval = 1 / 30  # 1/30초 간격
-total_time =  30 # 10초
+total_time =  10 # 10초
 num_iterations = int(total_time / interval) #이미지 출력 개수
 
 #########################################################################
