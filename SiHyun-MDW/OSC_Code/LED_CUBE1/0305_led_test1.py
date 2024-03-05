@@ -78,10 +78,10 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 밝기 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.7, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/test6/"
+directory_path = "/home/silolab_ksh/Desktop/test7/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -181,6 +181,8 @@ def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image
     for i in range(1280, num_pixels):
         pixels[i] = (int(255 * 0.7), int(255 * 0.6), int(255 * 0.4))  # 밝기 조절
         '''
+    for i in range(1280):
+        pixels[i] = (int(pixels[i][0] * 0.7), int(pixels[i][1] * 0.6), int(pixels[i][2] * 0.4))
     pixels.show() # LED ON
 
     
