@@ -44,27 +44,21 @@ from pythonosc import osc_server
 from pythonosc import udp_client
 
 Main_port_num=5557  # Window 포트번호
-Server1_port_num=4206  #라즈베리파이 포트번호
+Server1_port_num=4207  #라즈베리파이 포트번호
 
 # LED 설정
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
-num_pixels = 1728 + 192 #24*24 픽셀 3면, 8*8 픽셀 빈부분 3면
+num_pixels = 1728 + 192 #24*24 픽셀 3면, 8*8 픽셀 빈부분 3면 1920 pixels
 ORDER = neopixel.GRB
 
 # OSC 클라이언트 설정
-client_ip = '192.168.0.7'  # Window IP 주소
+client_ip = '192.168.50.191'  # Window IP 주소
 client_port = Main_port_num
 osc_client = udp_client.SimpleUDPClient(client_ip, client_port)
 
 # OSC 서버 설정
 ip = '0.0.0.0'  # 모든 IP 주소에서 수신
 port = Server1_port_num
-
-#이미지 채도를 강하게 만드는 함수
-def enhance_image(image):
-    enhancer=ImageEnhance.Brightness(image)
-    enhanced_image=enhancer.enhance(2.0)
-    return enhanced_image
 
 # OSC 메시지 처리를 위한 콜백 함수
 def receive_osc_message(address, *args):
@@ -81,8 +75,8 @@ def receive_osc_message(address, *args):
             time.sleep(0.5)
             pixels.fill((0, 0, 0))
             pixels.show()
-            osc_client.send_message("/Rasp1", 3)
-            print("Sent OSC message: /Rasp1 3")  # 전송한 메시지 출력
+            osc_client.send_message("/Rasp2", 4)
+            print("Sent OSC message: /Rasp2 4")  # 전송한 메시지 출력
         #OSC신호 0을 수신하면 LED OFF
         elif args[0]==0:
             pixels.fill((0, 0, 0))
@@ -100,7 +94,7 @@ print(f"OSC server listening on {ip}:{port}")
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/0304TEST1/TEST1_LED3/"
+directory_path = "/home/silolab_ksh/Desktop/TEST1_LED3/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -127,9 +121,9 @@ image_paths = [os.path.join(directory_path, filename) for filename in image_path
 def image_to_pixels(image_path):
     image=Image.open(image_path).convert("RGB") #이미지를 RGB색상모드로 변환
     enhancer=ImageEnhance.Contrast(image) 
-    image=enhancer.enhance(3) #이미지의 채도를 강하게.
+    image=enhancer.enhance(3.0) #이미지의 채도를 강하게.
 
-##원본이미지=40*72 픽셀
+##원본이미지= 40*72 픽셀
 
     #앞면 이미지 영역
     front1=image.crop((0,16,16,32))
@@ -269,7 +263,11 @@ def show_image(front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1
     for i in range(1280, num_pixels):
         pixels[i] = (int(255 * 0.7), int(255 * 0.6), int(255 * 0.4))  # 밝기 조절
     pixels.show() # LED ON
+    
     '''
+    for i in range(1920):
+        pixels[i] = (int(pixels[i][0] * 1), int(pixels[i][1] * 0.9), int(pixels[i][2] * 0.7))
+    
     pixels.show() # LED ON
     
 # 각 이미지를 픽셀 배열로 변환하여 배열에 저장 !! 제일 중요한 부분.
@@ -279,7 +277,7 @@ image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출
 interval = 1 / 30  # 1/30초 간격
-total_time = 12 # 10초
+total_time = 10 # 10초
 num_iterations = int(total_time / interval) #이미지 출력 개수
 
 #########################################################################
@@ -289,4 +287,4 @@ try:
         server.handle_request()
 except KeyboardInterrupt:
     server.server_close()
-    
+
