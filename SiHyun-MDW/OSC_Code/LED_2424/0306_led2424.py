@@ -70,7 +70,7 @@ def receive_osc_message(address, *args):
             for i in range(num_iterations):#출력할 이미지 개수
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index]) #이미지를 출력.
-                #time.sleep(interval)
+                time.sleep(1/90)
             end_time = time.time()
             execution_time = end_time - start_time
             print("코드 실행 시간:", execution_time, "초")
@@ -92,10 +92,10 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 밝기 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.7, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/TEST1_LED3/"
+directory_path = "/home/silolab_ksh/Desktop/13-3/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -115,36 +115,119 @@ image_paths.sort(key=lambda x: int(x.split("_")[1].split(".")[0]))
 image_paths = [os.path.join(directory_path, filename) for filename in image_paths]
 # iamge_paths= ['/home/user/images/image1.png', '/home/user/images/image2.png', '/home/user/images/image3.png', ...]
 
-def process_image(image_path):
-    # 이미지를 불러와 RGB 색상 모드로 변환
-    image = Image.open(image_path).convert("RGB")
-    
-    # 이미지의 채도를 강조
-    enhancer = ImageEnhance.Contrast(image) 
-    image = enhancer.enhance(3.0)
-    
-    # 이미지 영역을 자르고 상하 반전 수행
-    cropped_images = []
-    for box in [(0,16,16,32), (0,8,8,16), (8,8,16,16), (16,8,24,40), 
-                (24,16,40,32), (24,8,32,16), (32,8,40,16), (40,8,48,40), 
-                (48,16,64,32), (48,8,56,16), (56,8,64,16), (64,0,72,32)]:
-        cropped_image = image.crop(box)
-        cropped_image = cropped_image.transpose(Image.FLIP_TOP_BOTTOM)
-        cropped_images.append(list(cropped_image.getdata()))
-    
-    return cropped_images
+# 이미지각각 마다 이미지 영역을 자르고 픽셀 배열로 변환하는 함수
+def image_to_pixels(image_path):
+    image=Image.open(image_path).convert("RGB") #이미지를 RGB색상모드로 변환
+    enhancer=ImageEnhance.Contrast(image) 
+    image=enhancer.enhance(3.0) #이미지의 채도를 강하게.
 
-def show_image(*pixel_lists):
-    combined_pixels = [pixel for sublist in pixel_lists for pixel in sublist]
-    pixels[0:len(combined_pixels)] = combined_pixels
-    pixels.show()
+##원본이미지= 40*72 픽셀
 
+    #앞면 이미지 영역
+    front1=image.crop((0,16,16,32))
+    front2=image.crop((0,8,8,16))
+    front3=image.crop((8,8,16,16))
+    front4=image.crop((16,8,24,40))
+
+    #오른쪽면 이미지 영역
+    right1=image.crop((24,16,40,32))
+    right2=image.crop((24,8,32,16))
+    right3=image.crop((32,8,40,16))
+    right4=image.crop((40,8,48,40))
+
+    #오른쪽면 이미지 영역
+    top1=image.crop((48,16,64,32))
+    top2=image.crop((48,8,56,16))
+    top3=image.crop((56,8,64,16))
+    top4=image.crop((64,0,72,32))
+    
+## front 이미지들을 상하로 반전
+    front1 = front1.transpose(Image.FLIP_TOP_BOTTOM)
+    front2 = front2.transpose(Image.FLIP_TOP_BOTTOM)
+    front3 = front3.transpose(Image.FLIP_TOP_BOTTOM)
+    front4 = front4.transpose(Image.FLIP_TOP_BOTTOM)
+
+    # right 이미지들을 상하로 반전
+    right1 = right1.transpose(Image.FLIP_TOP_BOTTOM)
+    right2 = right2.transpose(Image.FLIP_TOP_BOTTOM)
+    right3 = right3.transpose(Image.FLIP_TOP_BOTTOM)
+    right4 = right4.transpose(Image.FLIP_TOP_BOTTOM)
+
+    # top 이미지들을 상하로 반전
+    top1 = top1.transpose(Image.FLIP_TOP_BOTTOM)
+    top2 = top2.transpose(Image.FLIP_TOP_BOTTOM)
+    top3 = top3.transpose(Image.FLIP_TOP_BOTTOM)
+    top4 = top4.transpose(Image.FLIP_TOP_BOTTOM)
+
+    
+##get Image pixel
+    # front 이미지들의 픽셀 데이터 리스트
+    front1_pixels = list(front1.getdata())
+    front2_pixels = list(front2.getdata())
+    front3_pixels = list(front3.getdata())
+    front4_pixels = list(front4.getdata())
+
+    # right 이미지들의 픽셀 데이터 리스트
+    right1_pixels = list(right1.getdata())
+    right2_pixels = list(right2.getdata())
+    right3_pixels = list(right3.getdata())
+    right4_pixels = list(right4.getdata())
+
+    # top 이미지들의 픽셀 데이터 리스트
+    top1_pixels = list(top1.getdata())
+    top2_pixels = list(top2.getdata())
+    top3_pixels = list(top3.getdata())
+    top4_pixels = list(top4.getdata())
+
+    #이미지들의 RGB색상들의 리스트가 배열로 저장됨.
+    image_pixel_lists = [
+        front1_pixels, front2_pixels, front3_pixels, front4_pixels,
+        right1_pixels, right2_pixels, right3_pixels, right4_pixels,
+        top1_pixels, top2_pixels, top3_pixels, top4_pixels
+    ]
+    # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
+    for i,image_pixels in enumerate(image_pixel_lists):
+        # 16*16 픽셀 'ㄹ' 모양 읽기
+        if i in [0,4,8]:# front1, right1, top1에 대해서만 전체 패턴을 적용
+            for y in range(16): # 16픽셀씩 'ㄹ'자로 16행까지
+                if y % 2 == 1:
+                    start_index = y * 16
+                    end_index = (y + 1) * 16
+                    image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
+        # 8*8 픽셀 'ㄹ' 모양 읽기
+        elif i in [1,2,5,6,9,10]: 
+            for y in range(8):# 8*8픽셀 8행까지
+                if y % 2 == 1:
+                    start_index= y* 8
+                    end_index = ( y+1 ) * 8
+                    image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
+        # 8*32 픽셀 'ㄹ' 모양 읽기
+        elif i in [3,7,11]:
+            for y in range(32): # 8픽셀씩 'ㄹ'자로 32행까지
+                if y % 2 == 1:
+                    start_index= y * 8
+                    end_index = ( y+1 ) * 8
+                    image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
+
+    return front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels
+
+#########################################################################
+# 이미지 출력 함수
+def show_image(front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels):
+    image_pixel_lists = [front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels]
+    
+    pixel_index = 0
+    for image_pixels in image_pixel_lists:
+        for pixel_value in image_pixels:
+            pixels[pixel_index] = pixel_value #pixel_value는 픽셀마다 색상값을 나타냄.
+            pixel_index += 1
+    pixels.show() # LED ON
 # 각 이미지를 픽셀 배열로 변환하여 배열에 저장
-image_pixels_list = [process_image(image_path) for image_path in image_paths]
+image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출e
 interval = 1 / 30  # 1/30초 간격
-total_time = 10 # 10초
+total_time = 5 # 10초
 num_iterations = int(total_time / interval) #이미지 출력 개수
 
 #########################################################################
