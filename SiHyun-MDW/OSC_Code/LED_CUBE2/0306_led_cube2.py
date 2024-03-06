@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-g
 
 import neopixel
@@ -19,7 +18,7 @@ Server1_port_num=4208  #라즈베리파이 포트번호
 
 # LED 설정
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
-num_pixels = 1280 +512#256 픽셀 LED 5개
+num_pixels = 1280#256 픽셀 LED 5개
 ORDER = neopixel.GRB
 
 # OSC 클라이언트 설정
@@ -37,10 +36,14 @@ def receive_osc_message(address, *args):
         print(f"Received OSC message from {address}: {args}")#수신한 메세지를 출력. 
         #OSC신호 1을 수신하면 콘텐츠 재생
         if args[0]==1:
+            start_time=time.time()
             for i in range(num_iterations):#출력할 이미지 개수
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index]) #이미지를 출력.
-                time.sleep(interval)
+                time.sleep(1/42)
+            end_time=time.time()
+            execution_time=end_time-start_time
+            print("TIME    :",execution_time,"sec")
             pixels.fill((0, 0, 0))
             pixels.show()
             osc_client.send_message("/Rasp3", 5)
@@ -49,7 +52,7 @@ def receive_osc_message(address, *args):
         elif args[0]==0:
             pixels.fill((0, 0, 0))
             pixels.show()
-            
+      
 # OSC 디스패처 설정
 dispatcher = dispatcher.Dispatcher()
 dispatcher.set_default_handler(receive_osc_message)
@@ -111,13 +114,6 @@ def image_to_pixels(image_path):
     image4_pixels = list(image4.getdata())
     image5_pixels = list(image5.getdata())
     
-    ''' 
-    image1_pixels 형식
-    [ (R,G,B), # 첫번째 픽셀의 색상
-      (R,G,B), # 두번째 픽셀의 색상
-      ...
-    ]
-    '''
     #이미지들의 RGB색상들의 리스트가 배열로 저장됨.
     image_pixel_lists = [image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels]
     
@@ -141,9 +137,6 @@ def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image
         pixels[i] = pixel_value
     pixels.show()
 
-    
-# 각 이미지를 픽셀 배열로 변환하여 배열에 저장 !! 제일 중요한 부분.
-# LED행렬을 만들어 낸다.
 # 이게 최종 image_pixelx_list !!
 image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
