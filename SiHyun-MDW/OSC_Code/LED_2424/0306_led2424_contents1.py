@@ -79,7 +79,7 @@ def receive_osc_message(address, *args):
             end_time = time.time()
             execution_time = end_time - start_time
             print("코드 실행 시간:", execution_time, "초")
-            pixels.fill((0, 0, 0))
+            pixels.fill((0, 0, 0))git 
             pixels.show()
             osc_client.send_message("/Rasp2", 4)
             print("Sent OSC message: /Rasp2 4")  # 전송한 메시지 출력
