@@ -1,17 +1,10 @@
-# -*- coding: utf-8 -*-
-
+import neopixel
+from PIL import Image, ImageEnhance
 import time
 import os
 import threading
 import sys
 import board
-import digitalio
-import busio
-from PIL import Image
-from PIL import ImageEnhance
-from adafruit_led_animation.animation.solid import Solid
-from adafruit_led_animation.color import BLACK
-from adafruit_led_animation.led_strip import Adafruit_DotStar
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
@@ -21,13 +14,9 @@ Main_port_num = 5557  # Window 포트번호
 Server1_port_num = 4206  # 라즈베리파이 포트번호
 
 # LED 설정
-num_pixels = 1280 + 512  # 256 픽셀 LED 5개
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
-
-# Create DotStar LED object
-pixels = Adafruit_DotStar(pixel_pin, num_pixels, auto_write=False)
-pixels.fill(BLACK)  # Clear all pixel colors
-pixels.show()  # Make sure to update the strip
+num_pixels = 1280 + 512  # 256 픽셀 LED 5개
+ORDER = neopixel.GRB
 
 # OSC 클라이언트 설정
 client_ip = '192.168.50.191'  # Window IP 주소
@@ -38,12 +27,15 @@ osc_client = udp_client.SimpleUDPClient(client_ip, client_port)
 ip = '0.0.0.0'  # 모든 IP 주소에서 수신
 port = Server1_port_num
 
-# LED 초기화
-pixels.fill(BLACK)  # Clear all pixel colors
-pixels.show()  # Make sure to update the strip
+# OSC 메시지 처리를 위한 플래그
+global osc_message_received
+osc_message_received = False
+
+# LED 초기화 및 밝기 설정
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.7, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/0304TEST1/TEST1_LED1/"
+directory_path = "/home/silolab_ksh/Desktop/test10/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -56,12 +48,12 @@ for filename in os.listdir(directory_path):
 # 파일 이름들의 숫자 순서대로 정렬
 image_paths.sort(key=lambda x: int(x.split("_")[1].split(".")[0]))
 
+# image_paths = ["image1.png", "image2.png", "image3.png"] 이런식으로 저장됨.
+
 # 정렬된 파일 이름들에 디렉토리 경로를 추가하여 완전한 파일 경로를 생성
 # 폴더의 경로가 아닌 각 이미지마다 자기 경로가 지정이됨.
 image_paths = [os.path.join(directory_path, filename) for filename in image_paths]
-
-
-'''---------------------------------------------------------------------------'''
+# iamge_paths= ['/home/user/images/image1.png', '/home/user/images/image2.png', '/home/user/images/image3.png', ...]
 
 # 이미지각각 마다 이미지 영역을 자르고 픽셀 배열로 변환하는 함수
 def image_to_pixels(image_path):
@@ -111,10 +103,85 @@ def image_to_pixels(image_path):
 
     return image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels
 
+# 각 이미지를 픽셀 배열로 변환하여 배열에 저장
+image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
-#########################################################################
+# 이미지를 1/30초 간격으로 송출
+interval = 1 / 30  # 1/30초 간격
+total_time = 10  # 10초
+num_iterations = int(total_time / interval)  # 이미지 출력 개수
+
+# OSC 메시지 처리를 병렬로 수행하는 함수
+def process_osc_messages():
+    global osc_message_received
+    global dispatcher
+    # OSC 서버 설정
+    dispatcher = dispatcher.Dispatcher()
+    dispatcher.set_default_handler(receive_osc_message)
+    server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
+    print(f"OSC server listening on {ip}:{port}")
+    # OSC 메시지 수신 대기
+    try:
+        while True:
+            server.handle_request()
+            osc_message_received = True
+    except KeyboardInterrupt:
+        server.server_close()
 # 이미지 출력 함수
-def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels):
-    combined_pixels = image1_pixels + image2_pixels + image3_pixels + image4_pixels + image5_pixels
+def show_image(image_pixels_list):
+    combined_pixels = []
+    for image_pixels in image_pixels_list:
+        combined_pixels.extend(image_pixels)
 
-    # 네오픽셀에 한 번에 모든 픽셀 값을
+    # LED에 픽셀 값을 설정하고 표시
+    for i, pixel_value in enumerate(combined_pixels):
+        pixels[i] = pixel_value
+    pixels.show()
+
+# 이미지 출력을 병렬로 수행하는 함수
+def process_images():
+    global osc_message_received  # 이미지 출력 함수에서도 global로 변수 선언
+    global dispatcher
+    while True:
+        # OSC 메시지가 수신되었을 때만 이미지 출력
+        if osc_message_received:
+            osc_message_received = False
+            for i in range(num_iterations):
+                index = i % len(image_pixels_list)
+                show_image(image_pixels_list[index])
+                time.sleep(interval)
+
+            pixels.fill((0, 0, 0))
+            pixels.show()
+            osc_client.send_message("/Rasp1", 3)
+            print("Sent OSC message: /Rasp1 3")
+
+# OSC 메시지 처리를 위한 콜백 함수
+def receive_osc_message(address, *args):
+    if address == "/SILOKSH":
+        print(f"Received OSC message from {address}: {args}")  # 수신한 메세지를 출력.
+        # OSC신호 1을 수신하면 콘텐츠 재생
+        if args[0] == 1:
+            global osc_message_received
+            osc_message_received = True
+        # OSC신호 0을 수신하면 LED OFF
+        elif args[0] == 0:
+            pixels.fill((0, 0, 0))
+            pixels.show()
+
+# OSC 메시지 처리를 위한 스레드 생성 및 시작
+osc_thread = threading.Thread(target=process_osc_messages)
+osc_thread.daemon = True
+osc_thread.start()
+
+# 이미지 출력을 위한 스레드 생성 및 시작
+image_thread = threading.Thread(target=process_images)
+image_thread.daemon = True
+image_thread.start()
+
+# 메인 스레드가 종료되면 프로그램 종료
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Program terminated.")
