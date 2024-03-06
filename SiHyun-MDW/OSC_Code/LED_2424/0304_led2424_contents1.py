@@ -68,9 +68,7 @@ def receive_osc_message(address, *args):
         if args[0]==1:
             for i in range(num_iterations):#출력할 이미지 개수
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
-                show_image(*image_pixels_list[index]) #이미지를 출력.
-                time.sleep(interval)
-            pixels.fill((0, 0, 0))
+                show_image(*image_pixels_list[index]) #이미지를 출력.            pixels.fill((0, 0, 0))
             pixels.show()
             osc_client.send_message("/Rasp2", 4)
             print("Sent OSC message: /Rasp2 4")  # 전송한 메시지 출력
@@ -191,19 +189,6 @@ def image_to_pixels(image_path):
         right1_pixels, right2_pixels, right3_pixels, right4_pixels,
         top1_pixels, top2_pixels, top3_pixels, top4_pixels
     ]
-    '''
-    # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
-    for image_pixels in image_pixel_lists:
-        for y in range(16): # 0부터 15까지
-            #이미지는 x가 작은 순부터 읽기 때문에 네오픽셀 특성상
-            #홀수번째 행일때만 이미지를 반대로 뒤집음.
-            if y % 2 == 1:
-                start_index = y * 16
-                end_index = (y + 1) * 16
-                image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
-                
-    return image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels
-    '''
     # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
     for i,image_pixels in enumerate(image_pixel_lists):
         # 16*16 픽셀 'ㄹ' 모양 읽기
