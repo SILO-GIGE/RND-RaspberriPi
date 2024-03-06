@@ -259,12 +259,21 @@ def image_to_pixels(image_path):
     for i in range(1920):
         pixels[i] = (int(pixels[i][0] * 1), int(pixels[i][1] * 0.9), int(pixels[i][2] * 0.7))
 ''' 
-def show_image(front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels):
-    combined_pixels=front1_pixels+ front2_pixels+ front3_pixels+front4_pixels+right1_pixels+ right2_pixels+right3_pixels+right4_pixels+top1_pixels+top2_pixels+top3_pixels+top4_pixels
+def show_image(*image_pixels_list):
+    combined_pixels = []
+    for image_pixels in image_pixels_list:
+        combined_pixels.extend(image_pixels)
+
+    # 이미지 픽셀 리스트의 길이가 LED 픽셀 개수와 같은지 확인
+    if len(combined_pixels) != num_pixels:
+        print("Error: The number of pixels in the image does not match the number of pixels in the LED strip.")
+        return
+
+    # LED에 픽셀 값을 설정하고 출력
     for i, pixel_value in enumerate(combined_pixels):
         pixels[i] = pixel_value
-    pixels.show()    
-                  
+    pixels.show()
+
 # 이게 최종 image_pixelx_list !!
 image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 '''
