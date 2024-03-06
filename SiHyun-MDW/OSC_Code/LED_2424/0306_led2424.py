@@ -60,15 +60,9 @@ osc_client = udp_client.SimpleUDPClient(client_ip, client_port)
 ip = '0.0.0.0'  # 모든 IP 주소에서 수신
 port = Server1_port_num
 
-# 이미지를 출력할 때 사용할 변수
-next_image_index = 0
-show_image_flag = False
-'''
 # OSC 메시지 처리를 위한 콜백 함수
 def receive_osc_message(address, *args):
-    global show_image_flag
     if address == "/SILOKSH":
-        start_time = time.time()
         print(f"Received OSC message from {address}: {args}")#수신한 메세지를 출력. 
         #OSC신호 1을 수신하면 콘텐츠 재생
         if args[0]==1:
@@ -76,10 +70,7 @@ def receive_osc_message(address, *args):
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index]) #이미지를 출력.
                 time.sleep(interval)
-            end_time = time.time()
-            execution_time = end_time - start_time
-            print("코드 실행 시간:", execution_time, "초")
-            pixels.fill((0, 0, 0))git 
+            pixels.fill((0, 0, 0))
             pixels.show()
             osc_client.send_message("/Rasp2", 4)
             print("Sent OSC message: /Rasp2 4")  # 전송한 메시지 출력
@@ -87,35 +78,7 @@ def receive_osc_message(address, *args):
         elif args[0]==0:
             pixels.fill((0, 0, 0))
             pixels.show()
-'''
-
-# OSC 메시지 처리를 위한 콜백 함수
-def receive_osc_message(address, *args):
-    global show_image_flag
-    if address == "/SILOKSH":
-        print(f"Received OSC message from {address}: {args}")#수신한 메세지를 출력. 
-        # OSC신호 1을 수신하면 콘텐츠 재생 시작을 플래그에 설정
-        if args[0] == 1:
-            show_image_flag = True
-            print("Received OSC signal 1")
-        # OSC신호 0을 수신하면 LED OFF
-        elif args[0] == 0:
-            pixels.fill((0, 0, 0))
-            pixels.show()
-            print("Received OSC signal 0")
-# 이미지 출력 함수
-def show_next_image():
-    global next_image_index
-    global show_image_flag
-    
-    # show_image_flag가 True이면 이미지를 출력
-    if show_image_flag:
-        image_pixels = image_pixels_list[next_image_index]
-        show_image(*image_pixels)
-        next_image_index = (next_image_index + 1) % len(image_pixels_list) # 다음 이미지 인덱스 결정
-        show_image_flag = False # 이미지 출력 완료 후 플래그를 False로 설정
-
-        
+            
 # OSC 디스패처 설정
 dispatcher = dispatcher.Dispatcher()
 dispatcher.set_default_handler(receive_osc_message)
@@ -228,6 +191,19 @@ def image_to_pixels(image_path):
         right1_pixels, right2_pixels, right3_pixels, right4_pixels,
         top1_pixels, top2_pixels, top3_pixels, top4_pixels
     ]
+    '''
+    # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
+    for image_pixels in image_pixel_lists:
+        for y in range(16): # 0부터 15까지
+            #이미지는 x가 작은 순부터 읽기 때문에 네오픽셀 특성상
+            #홀수번째 행일때만 이미지를 반대로 뒤집음.
+            if y % 2 == 1:
+                start_index = y * 16
+                end_index = (y + 1) * 16
+                image_pixels[start_index:end_index] = reversed(image_pixels[start_index:end_index])
+                
+    return image1_pixels,image2_pixels,image3_pixels,image4_pixels,image5_pixels
+    '''
     # 'ㄹ' 모양의 패턴에 맞게 이미지 배열을 재구성
     for i,image_pixels in enumerate(image_pixel_lists):
         # 16*16 픽셀 'ㄹ' 모양 읽기
@@ -255,33 +231,51 @@ def image_to_pixels(image_path):
     return front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels
 
 #########################################################################
-'''
+# 이미지 출력 함수
+def show_image(front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels):
+    image_pixel_lists = [front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels]
+    
+    pixel_index = 0
+    for image_pixels in image_pixel_lists:
+        for pixel_value in image_pixels:
+            pixels[pixel_index] = pixel_value #pixel_value는 픽셀마다 색상값을 나타냄.
+            pixel_index += 1
+    
+    '''
+    픽셀 1개 마다 이미지의 RGB값이 저장되어 LED 행렬이 설정된다.
+    pixels[0] = (255, 255, 255)  # 첫 번째 픽셀의 RGB 색상 값 (흰색)
+    pixels[1] = (0, 0, 0)        # 두 번째 픽셀의 RGB 색상 값 (검은색)
+    pixels[2] = (255, 0, 0)      # 세 번째 픽셀의 RGB 색상 값 (빨강)
+    pixels[3] = (0, 255, 0)      # 네 번째 픽셀의 RGB 색상 값 (녹색)
+    ...
+    '''
+
+    # 1부터 1280까지의 LED에 대해 밝기 0.1 설정
+    #
+    '''
+    for i in range(1280):
+        pixels[i] = (int(pixels[i][0] * 1), int(pixels[i][1] * 1), int(pixels[i][2] * 1))
+    
+    # 1280부터 1792까지의 LED에 대해 밝기 1로 설정
+    for i in range(1280, num_pixels):
+        pixels[i] = (int(255 * 0.7), int(255 * 0.6), int(255 * 0.4))  # 밝기 조절
+    pixels.show() # LED ON
+    
+    '''
     for i in range(1920):
         pixels[i] = (int(pixels[i][0] * 1), int(pixels[i][1] * 0.9), int(pixels[i][2] * 0.7))
-''' 
-def show_image(*image_pixels_list):
-    combined_pixels = []
-    for image_pixels in image_pixels_list:
-        combined_pixels.extend(image_pixels)
-
-    # 이미지 픽셀 리스트의 길이가 LED 픽셀 개수와 같은지 확인
-    if len(combined_pixels) != num_pixels:
-        print("Error: The number of pixels in the image does not match the number of pixels in the LED strip.")
-        return
-
-    # LED에 픽셀 값을 설정하고 출력
+    
+    pixels.show() # LED ON
+def show_image(front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels):
+    combined_pixels=front1_pixels+ front2_pixels+ front3_pixels+ front4_pixels+right1_pixels+right2_pixels+right3_pixels+right4_pixels+top1_pixels+top2_pixels+top3_pixels+ top4_pixels
     for i, pixel_value in enumerate(combined_pixels):
         pixels[i] = pixel_value
-    pixels.show()
-
+    pixels.show()   
+# 각 이미지를 픽셀 배열로 변환하여 배열에 저장 !! 제일 중요한 부분.
+# LED행렬을 만들어 낸다.
 # 이게 최종 image_pixelx_list !!
 image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
-'''
-for i in range(num_iterations):#출력할 이미지 개수
-    index = i % len(image_pixels_list)  # 이미지 배열을 순환
-    show_image(*image_pixels_list[index]) #이미지를 출력.
-    time.sleep(interval)
-    '''
+
 # 이미지를 1/30초 간격으로 송출
 interval = 1 / 30  # 1/30초 간격
 total_time = 10 # 10초
@@ -292,8 +286,6 @@ num_iterations = int(total_time / interval) #이미지 출력 개수
 try:
     while True:
         server.handle_request()
-        show_next_image()
-        time.sleep(0.01) # 추가된 부분: CPU 부하를 줄이기 위해 잠시 대기
 except KeyboardInterrupt:
     server.server_close()
 
