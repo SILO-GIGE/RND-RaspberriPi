@@ -40,7 +40,7 @@ def receive_osc_message(address, *args):
             for i in range(num_iterations):#출력할 이미지 개수
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index]) #이미지를 출력.
-                time.sleep(1/42)
+                time.sleep(1/25)
             end_time=time.time()
             execution_time=end_time-start_time
             print("TIME    :",execution_time,"sec")
@@ -62,10 +62,10 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 밝기 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/0304TEST1/TEST1_LED2/"
+directory_path = "/home/silolab_ksh/Desktop/13-2/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -142,7 +142,7 @@ image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출s
 interval = 1 / 30  # 1/30초 간격
-total_time =  10 # 10초
+total_time =  5 # 10초
 num_iterations = int(total_time / interval) #이미지 출력 개수
 
 #########################################################################
