@@ -131,14 +131,14 @@ def image_to_pixels(image_path):
 #########################################################################
 # 이미지 출력 함수
 def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels):
-    combined_pixels=image1_pixels+ image2_pixels+ image3_pixels+ image4_pixels+ image5_pixels
+    combined_pixels = image1_pixels + image2_pixels + image3_pixels + image4_pixels + image5_pixels
     for i, pixel_value in enumerate(combined_pixels):
-        pixels[i] = pixel_value
-    for i in range(1280):
-        pixels[i] = (int(pixels[i][0] * 1), int(pixels[i][1] * 0.9), int(pixels[i][2] * 0.5))
-    for i in range(1280,2304):
-        pixels[i] = (60,60,30)    
+        if i < 1280:
+            pixels[i] = (int(pixel_value[0] * 1), int(pixel_value[1] * 0.9), int(pixel_value[2] * 0.5))
+        else:
+            pixels[i] = (60, 60, 30)
     pixels.show()
+
 
 # 이게 최종 image_pixelx_list !!
 image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
