@@ -32,8 +32,6 @@ port = Server1_port_num
 
 # OSC 메시지 처리를 위한 콜백 함수
 def receive_osc_message(address, *args):
-    for i in range(1280, 2304):
-        pixels[i] = (255, 215, 200)  # 화이트 설정
     if address == "/SILOKSH":
         print(f"Received OSC message from {address}: {args}")#수신한 메세지를 출력. 
         #OSC신호 1을 수신하면 콘텐츠 재생
@@ -66,7 +64,7 @@ print(f"OSC server listening on {ip}:{port}")
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.7, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/test12/"
+directory_path = "/home/silolab_ksh/Desktop/11/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -93,7 +91,7 @@ image_paths = [os.path.join(directory_path, filename) for filename in image_path
 def image_to_pixels(image_path):
     image=Image.open(image_path).convert("RGB") #이미지를 RGB색상모드로 변환
     enhancer=ImageEnhance.Contrast(image) 
-    image=enhancer.enhance(5.0) #이미지의 채도를 강하게.
+    image=enhancer.enhance(1.7) #이미지의 채도를 강하게.
 
     image1 = image.crop((0, 0, 16, 16)) 
     image2 = image.crop((16, 0, 32, 16)) 
@@ -136,6 +134,10 @@ def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image
     combined_pixels=image1_pixels+ image2_pixels+ image3_pixels+ image4_pixels+ image5_pixels
     for i, pixel_value in enumerate(combined_pixels):
         pixels[i] = pixel_value
+    for i in range(1280):
+        pixels[i] = (int(pixels[i][0] * 1), int(pixels[i][1] * 0.9), int(pixels[i][2] * 0.5))
+    for i in range(1280,2304):
+        pixels[i] = (60,60,30)    
     pixels.show()
 
 # 이게 최종 image_pixelx_list !!
@@ -143,7 +145,7 @@ image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
 # 이미지를 1/30초 간격으로 송출s
 interval = 1 / 30  # 1/30초 간격
-total_time =  5 # 10초
+total_time =  12 # 10초
 num_iterations = int(total_time / interval) #이미지 출력 개수
 
 #########################################################################
