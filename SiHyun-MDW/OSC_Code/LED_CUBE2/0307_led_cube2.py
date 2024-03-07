@@ -27,9 +27,10 @@ def receive_osc_message(address, *args):
     if address == "/SILOKSH" and args[0] == 1:
         print(f"Received OSC message from {address}: {args}")#수신한 메세지를 출력. 
         start_time = time.time()
-        for i in range(num_iterations):
+        #for i in range(num_iterations):
+        for i in range(539):
             show_image(*image_pixels_list[i % len(image_pixels_list)])
-            time.sleep(1/30)
+            time.sleep(1/28.1)
         end_time = time.time()
         execution_time = end_time - start_time
         print("TIME    :", execution_time, "sec")
@@ -54,7 +55,7 @@ print(f"OSC server listening on {ip}:{port}")
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/o14-2/"
+directory_path = "/home/silolab_ksh/Desktop/16-2/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = [os.path.join(directory_path, filename) for filename in sorted(os.listdir(directory_path)) if filename.endswith(".png")]
@@ -89,7 +90,7 @@ num_iterations = int(total_time / interval)  # 이미지 출력 개수
 def show_image(image1_pixels, image2_pixels, image3_pixels, image4_pixels, image5_pixels):
     combined_pixels = image1_pixels + image2_pixels + image3_pixels + image4_pixels + image5_pixels
     for i, pixel_value in enumerate(combined_pixels):
-        pixels[i] = (int(pixel_value[0] * 1), int(pixel_value[1] * 0.9), int(pixel_value[2] * 0.5))
+        pixels[i] = (int(pixel_value[0] * 1), int(pixel_value[1] * 0.9), int(pixel_value[2] * 0.9))
     pixels.show()
 
 # OSC 메시지 수신 대기
