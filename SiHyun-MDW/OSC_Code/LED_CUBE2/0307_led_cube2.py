@@ -29,14 +29,14 @@ def receive_osc_message(address, *args):
         start_time = time.time()
         for i in range(num_iterations):
             show_image(*image_pixels_list[i % len(image_pixels_list)])
-            time.sleep(1/25)
+            time.sleep(1/30)
         end_time = time.time()
         execution_time = end_time - start_time
         print("TIME    :", execution_time, "sec")
-        pixels.fill((0, 0, 0))
-        pixels.show()
-        osc_client.send_message("/Rasp1", 3)
-        print("Sent OSC message: /Rasp1 3")
+        #pixels.fill((0, 0, 0))
+        #pixels.show()
+        osc_client.send_message("/Rasp3", 5)
+        print("Sent OSC message: /Rasp3 5")
     elif address == "/SILOKSH" and args[0] == 0:
         print(f"Received OSC message from {address}: {args}")#수신한 메세지를 출력. 
         pixels.fill((0, 0, 0))
@@ -51,7 +51,7 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 밝기 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.7, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
 directory_path = "/home/silolab_ksh/Desktop/o14-2/"
