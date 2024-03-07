@@ -28,7 +28,7 @@ num_pixels = 1280 +512#256 픽셀 LED 5개
 ORDER = neopixel.GRB
 
 # OSC 클라이언트 설정
-client_ip = '192.168.0.7'  # Window IP 주소
+client_ip = '192.168.50.191'  # Window IP 주소
 client_port = Main_port_num
 osc_client = udp_client.SimpleUDPClient(client_ip, client_port)
 
