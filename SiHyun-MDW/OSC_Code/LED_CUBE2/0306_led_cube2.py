@@ -40,7 +40,7 @@ def receive_osc_message(address, *args):
             for i in range(num_iterations):#출력할 이미지 개수
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index]) #이미지를 출력.
-                time.sleep(1/25)
+                time.sleep(1/27)
             end_time=time.time()
             execution_time=end_time-start_time
             print("TIME    :",execution_time,"sec")
@@ -62,10 +62,10 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 밝기 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.1, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/13-2/"
+directory_path = "/home/silolab_ksh/Desktop/o14-2/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -92,7 +92,7 @@ image_paths = [os.path.join(directory_path, filename) for filename in image_path
 def image_to_pixels(image_path):
     image=Image.open(image_path).convert("RGB") #이미지를 RGB색상모드로 변환
     enhancer=ImageEnhance.Contrast(image) 
-    image=enhancer.enhance(5.0) #이미지의 채도를 강하게.
+    image=enhancer.enhance(2.0) #이미지의 채도를 강하게.
 
     image1 = image.crop((0, 0, 16, 16)) 
     image2 = image.crop((16, 0, 32, 16)) 
