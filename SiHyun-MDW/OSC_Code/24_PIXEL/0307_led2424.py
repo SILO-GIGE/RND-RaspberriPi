@@ -48,7 +48,7 @@ Server1_port_num=4207  #라즈베리파이 포트번호
 
 # LED 설정
 pixel_pin = board.D18  # GPIO 18에 연결된 LED
-num_pixels = 1728 + 192 #24*24 픽셀 3면, 8*8 픽셀 빈부분 3면 1920 pixels
+num_pixels = 1728 + 192#24*24 픽셀 3면, 8*8 픽셀 빈부분 3면 1920 pixels
 ORDER = neopixel.GRB
 
 # OSC 클라이언트 설정
@@ -70,7 +70,7 @@ def receive_osc_message(address, *args):
             for i in range(num_iterations):#출력할 이미지 개수
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index]) #이미지를 출력.
-                time.sleep(1/90)
+                time.sleep(1/95)
             end_time = time.time()
             execution_time = end_time - start_time
             print("코드 실행 시간:", execution_time, "초")
@@ -92,7 +92,7 @@ server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
 print(f"OSC server listening on {ip}:{port}")
 
 # LED 초기화 및 밝기 설정
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.1, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
 directory_path = "/home/silolab_ksh/Desktop/o14-3/"
@@ -119,7 +119,7 @@ image_paths = [os.path.join(directory_path, filename) for filename in image_path
 def image_to_pixels(image_path):
     image=Image.open(image_path).convert("RGB") #이미지를 RGB색상모드로 변환
     enhancer=ImageEnhance.Contrast(image) 
-    image=enhancer.enhance(5.0) #이미지의 채도를 강하게.
+    image=enhancer.enhance(3.0) #이미지의 채도를 강하게.
     ##원본이미지= 40*72 픽셀
     #앞면 이미지 영역
     front1=image.crop((0,16,16,32))
@@ -212,14 +212,12 @@ def image_to_pixels(image_path):
 #########################################################################
 # 이미지 출력 함수
 def show_image(front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels):
-    image_pixel_lists = [front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels]
-    
-    pixel_index = 0
-    for image_pixels in image_pixel_lists:
-        for pixel_value in image_pixels:
-            pixels[pixel_index] = pixel_value #pixel_value는 픽셀마다 색상값을 나타냄.
-            pixel_index += 1
-    pixels.show() # LED ON
+    #image_pixel_lists = [front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels]
+    combined_pixels=front1_pixels+ front2_pixels+ front3_pixels+front4_pixels+right1_pixels+right2_pixels+right3_pixels+right4_pixels+top1_pixels+top2_pixels+top3_pixels+top4_pixels
+    for i, pixel_value in enumerate(combined_pixels):
+        pixels[i] = (int(pixel_value[0] * 1), int(pixel_value[1] * 0.9), int(pixel_value[2] * 0.6))
+
+    pixels.show()
 # 각 이미지를 픽셀 배열로 변환하여 배열에 저장
 image_pixels_list = [image_to_pixels(image_path) for image_path in image_paths]
 
