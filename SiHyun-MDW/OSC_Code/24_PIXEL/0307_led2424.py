@@ -67,10 +67,11 @@ def receive_osc_message(address, *args):
         #OSC신호 1을 수신하면 콘텐츠 재생
         if args[0]==1:
             start_time = time.time()
-            for i in range(num_iterations):#출력할 이미지 개수
+            #for i in range(num_iterations):#출력할 이미지 개수
+            for i in range(539):#출력할 이미지 개수
                 index = i % len(image_pixels_list)  # 이미지 배열을 순환
                 show_image(*image_pixels_list[index]) #이미지를 출력.
-                time.sleep(1/95)
+                time.sleep(1/99.1)
             end_time = time.time()
             execution_time = end_time - start_time
             print("코드 실행 시간:", execution_time, "초")
@@ -95,7 +96,7 @@ print(f"OSC server listening on {ip}:{port}")
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False, pixel_order=ORDER)
 
 # 이미지 파일이 있는 디렉토리 경로
-directory_path = "/home/silolab_ksh/Desktop/o14-3/"
+directory_path = "/home/silolab_ksh/Desktop/16-3-2/"
 
 # 이미지 파일들의 경로를 저장할 배열
 image_paths = []
@@ -215,7 +216,8 @@ def show_image(front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1
     #image_pixel_lists = [front1_pixels, front2_pixels, front3_pixels, front4_pixels,right1_pixels, right2_pixels, right3_pixels, right4_pixels,top1_pixels, top2_pixels, top3_pixels, top4_pixels]
     combined_pixels=front1_pixels+ front2_pixels+ front3_pixels+front4_pixels+right1_pixels+right2_pixels+right3_pixels+right4_pixels+top1_pixels+top2_pixels+top3_pixels+top4_pixels
     for i, pixel_value in enumerate(combined_pixels):
-        pixels[i] = (int(pixel_value[0] * 1), int(pixel_value[1] * 0.9), int(pixel_value[2] * 0.6))
+        pixels[i] = (int(pixel_value[0] * 1), int(pixel_value[1] * 0.9), int(pixel_value[2] * 0.5))
+        #pixels[i] = (int(pixel_value[0] * 1), int(pixel_value[1] * 0.9), int(pixel_value[2] * 0.6))
 
     pixels.show()
 # 각 이미지를 픽셀 배열로 변환하여 배열에 저장
